@@ -1,4 +1,5 @@
 const Chat = require('../models/chatModel');
+const { getReceiverSocketId , io } = require('../Socket/socket');
 const Message = require('../models/messageModel');
 const asyncHandler = require('express-async-handler');
 
@@ -22,8 +23,19 @@ const sendMessage = asyncHandler( async ( req, res )=>{
    if( newMessage ){
     chat.messages.push(newMessage._id);
    }
-   await Promise.all([ chat.save() , newMessage.save()]);
-   res.status(201).json(newMessage);
+   
+  try {
+    await Promise.all([chat.save(), newMessage.save()]);
+    // const receiverSocketId = getReceiverSocketId(receiverId);
+    // if (receiverSocketId) {
+    //   io.to(receiverSocketId).emit('newMessage', newMessage);
+    // }
+    res.json(newMessage);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to send message' });
+  }
+   
 } )
 const getMessage = asyncHandler (async ( req, res )=>{
     const { id : userToChatId } = req.params;
@@ -34,9 +46,7 @@ const getMessage = asyncHandler (async ( req, res )=>{
     if( !chat ){
         return res.json([]);
     }
-    console.log(chat.messages);
-    chat.messages.createdAt = new Date(chat.messages.createdAt).toISOString();
-    console.log(chat.messages.createdAt);
+    
     const message = chat.messages;
     res.json(message);
 })

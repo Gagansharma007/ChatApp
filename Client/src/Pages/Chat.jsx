@@ -5,6 +5,8 @@ import MessageContainer from '../Components/Messages/MessageContainer';
 import Sidebar from '../Components/SidebarComponents/Sidebar';
 import { useFetchAllUsersMutation } from '../slices/userApiSlice';
 import { fetchUsers } from '../slices/chatSlice';
+import InputMessage from '../Components/Messages/InputMessage';
+
 const Chat = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -15,11 +17,15 @@ const Chat = () => {
             navigate('/login');
             return;
         }
-        const f = async () =>{
-            const res = await fetchAllUsers().unwrap();
-            dispatch( fetchUsers(res) );
-        }
-        f();
+        const fetchUsersData = async () => {
+            try {
+                const users = await fetchAllUsers().unwrap();
+                dispatch(fetchUsers(users));
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+            }
+        };
+        fetchUsersData();
     },[navigate , userInfo , dispatch, fetchAllUsers ]);
   return (
     <div>
@@ -27,7 +33,10 @@ const Chat = () => {
         userInfo && 
         <div style={{ display : 'flex', flexDirection: 'row'}}>
             <Sidebar />
-            <MessageContainer/>
+            <div>
+                <MessageContainer/>
+                <InputMessage/>
+            </div>
         </div>   
     }
     </div>

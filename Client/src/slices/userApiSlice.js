@@ -49,6 +49,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 credentials: 'include'
             }),
         }),
+        sendChatMessage: builder.mutation({
+            query: ( { add , message })=> (
+                {
+                url: `${USERS_URL}/messages/send/${add}`,
+                method: 'POST',
+                body: message,
+                credentials: 'include'
+            }),
+        }),
     }),
 });
 
@@ -59,4 +68,5 @@ export const {
     useUpdateUserMutation,
     useFetchAllUsersMutation,
     useFetchChatMessagesMutation,
+    useSendChatMessageMutation,
 } = userApiSlice ;
